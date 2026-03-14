@@ -19,7 +19,7 @@ export async function login(username, password) {
 
 export const getUser = async () => {
     try {
-        const response = await api.get("/users/me");
+        const response = await api.get("/auth/employee/me");
         return response.data.data;
     } catch (e) {
         console.error("getUser error:", e.response?.data || e.message);

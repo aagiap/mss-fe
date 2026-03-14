@@ -6,6 +6,8 @@ import Logout from "./components/Logout.jsx";
 import ProtectedRoute from "./routes/ProtectedRoute.jsx";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import LoginPage from "./pages/auth/LoginPage.jsx";
+import StoreManagementPage from "./pages/admin/StoreManagementPage.jsx";
+import EmployeeManagementPage from "./pages/admin/EmployeeManagementPage.jsx";
 
 function App() {
 
@@ -30,13 +32,16 @@ function App() {
             {/* ================= USER ROUTES ================= */}
             {/*<Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />*/}
             {/* ================= ADMIN ROUTES ================= */}
-            {/*<Route path="/admin/*" element={*/}
-            {/*  <ProtectedRoute roles={['ROLE_ADMIN']}>*/}
-            {/*    <Routes>*/}
-            {/*      <Route path="dashboard" element={<AdminDashboard />} />*/}
-            {/*    </Routes>*/}
-            {/*  </ProtectedRoute>*/}
-            {/*} />*/}
+            <Route path="/admin/*" element={
+              <ProtectedRoute roles={['ROLE_ADMIN']}>
+                <Routes>
+                  <Route path="" element={<Navigate to="store" replace />} />
+
+                  <Route path="store" element={<StoreManagementPage />} />
+                  <Route path="employee" element={<EmployeeManagementPage />} />
+                </Routes>
+              </ProtectedRoute>
+            } />
 
             {/* Catch-all: Nếu gõ bậy bạ thì về trang chủ */}
             <Route path="*" element={<Navigate to="/" replace />} />
