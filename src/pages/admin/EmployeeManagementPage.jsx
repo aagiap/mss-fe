@@ -5,12 +5,14 @@ import CreateEmployeeForm from '../../components/admin/CreateEmployeeForm';
 import UpdateEmployeeForm from '../../components/admin/UpdateEmployeeForm.jsx';
 import employeeApi from '../../api/employee';
 import AdminSidebar from "../../components/admin/AdminSidebar.jsx";
+import storeService from "../../api/store.jsx";
 
 const EmployeeManagementPage = () => {
     // Quản lý hiển thị: 'list', 'create', 'update'
     const [currentView, setCurrentView] = useState('list');
 
     // State lưu dữ liệu
+    const [stores, setStores] = useState([]);
     const [employees, setEmployees] = useState([]);
     const [selectedEmployee, setSelectedEmployee] = useState(null);
     const [totalElements, setTotalElements] = useState(0);
@@ -45,6 +47,8 @@ const EmployeeManagementPage = () => {
         }
     };
 
+
+
     // Theo dõi sự thay đổi của filters để call API
     useEffect(() => {
         if (currentView === 'list') {
@@ -52,6 +56,19 @@ const EmployeeManagementPage = () => {
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [filters, currentView]);
+
+    useEffect(() => {
+        const fetchStores = async () => {
+            try {
+                const response = await storeService.getAll();
+                const data = response.data || response;
+                setStores(Array.isArray(data) ? data : []);
+            } catch (error) {
+                console.error('Lỗi khi tải danh sách cửa hàng:', error);
+            }
+        };
+        fetchStores();
+    }, []);
 
     // ---- CÁC HÀM XỬ LÝ SỰ KIỆN ----
     const handleFilterChange = (newFilters) => {
@@ -94,6 +111,7 @@ const EmployeeManagementPage = () => {
             case 'create':
                 return (
                     <CreateEmployeeForm
+                        stores={stores}
                         onSave={handleCreateEmployee}
                         onCancel={() => setCurrentView('list')}
                     />
@@ -101,6 +119,7 @@ const EmployeeManagementPage = () => {
             case 'update':
                 return (
                     <UpdateEmployeeForm
+                        stores={stores}
                         employee={selectedEmployee}
                         onSave={handleUpdateEmployee}
                         onCancel={() => setCurrentView('list')}
@@ -112,6 +131,7 @@ const EmployeeManagementPage = () => {
                     <EmployeeList
                         employees={employees}
                         filters={filters}
+                        stores={stores}
                         totalPages={totalPages}
                         totalElements={totalElements}
                         onFilterChange={handleFilterChange}

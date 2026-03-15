@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
     Box,
     Typography,
@@ -29,19 +29,33 @@ import BlockIcon from '@mui/icons-material/Block';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import LaunchIcon from '@mui/icons-material/Launch';
 
-const employees = [
-    { id: '101', name: 'John Doe', username: 'jdoe88', store: 'Downtown Hub', role: 'Manager', status: 'Active', initials: 'JD' },
-    { id: '102', name: 'Jane Smith', username: 'jsmith22', store: 'North Mall', role: 'Staff', status: 'Active', initials: 'JS' },
-    { id: '103', name: 'Robert Brown', username: 'rbrown90', store: 'West Side', role: 'Staff', status: 'Inactive', initials: 'RB' },
-    { id: '104', name: 'Emily Davis', username: 'edavis_x', store: 'Downtown Hub', role: 'Supervisor', status: 'Active', initials: 'ED' },
-    { id: '105', name: 'Michael Wilson', username: 'mwilson_retail', store: 'East Gate', role: 'Staff', status: 'Active', initials: 'MW' },
-];
+const EmployeeList = ({
+                          employees = [],
+                          stores = [],// Mặc định là mảng rỗng nếu không có dữ liệu
+                          onAdd,
+                          onEdit,
+                          onToggleStatus,
+                          filters,
+                          onFilterChange,
+                          totalPages = 1,
+                          totalElements = 0
+                      }) => {
+    const [localKeyword, setLocalKeyword] = useState(filters?.keyword || '');
 
-const EmployeeList = () => {
+    const handleSearch = (e) => {
+        if (e.key === 'Enter') {
+            onFilterChange({ ...filters, keyword: localKeyword, page: 1 });
+        }
+    };
+
+    const getInitials = (name) => {
+        if (!name) return 'U';
+        return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+    };
+
     return (
         <Box sx={{ p: 4, backgroundColor: '#fcfcfc', minHeight: '100vh' }}>
-
-            {/* Header */}
+            {/* Header Section */}
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 4 }}>
                 <Box>
                     <Typography variant="h4" sx={{ fontWeight: 900, color: '#000' }}>Employee Management</Typography>
@@ -52,6 +66,7 @@ const EmployeeList = () => {
                 <Button
                     variant="contained"
                     startIcon={<PersonAddAlt1Icon />}
+                    onClick={onAdd}
                     sx={{ backgroundColor: '#000', textTransform: 'none', borderRadius: 2, fontWeight: 700, px: 3, py: 1 }}
                 >
                     Create New Employee
@@ -66,7 +81,10 @@ const EmployeeList = () => {
                         <TextField
                             fullWidth
                             size="small"
-                            placeholder="Search by name or ID..."
+                            placeholder="Press Enter to search..."
+                            value={localKeyword}
+                            onChange={(e) => setLocalKeyword(e.target.value)}
+                            onKeyDown={handleSearch}
                             InputProps={{
                                 startAdornment: <InputAdornment position="start"><SearchIcon fontSize="small" /></InputAdornment>,
                             }}
@@ -79,13 +97,19 @@ const EmployeeList = () => {
                             select
                             fullWidth
                             size="small"
-                            defaultValue="all"
+                            value={filters?.storeId || 'all'}
+                            onChange={(e) => onFilterChange({ ...filters, storeId: e.target.value, page: 1 })}
                             InputProps={{
                                 startAdornment: <InputAdornment position="start"><StorefrontIcon fontSize="small" /></InputAdornment>,
                             }}
                             sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
                         >
                             <MenuItem value="all">All Stores</MenuItem>
+                            {stores.map((store) => (
+                                <MenuItem key={store.id} value={store.id}>
+                                    ST-{store.id} | {store.name}
+                                </MenuItem>
+                            ))}
                         </TextField>
                     </Grid>
                     <Grid item xs={12} md={3}>
@@ -94,13 +118,17 @@ const EmployeeList = () => {
                             select
                             fullWidth
                             size="small"
-                            defaultValue="all"
+                            value={filters?.role || 'all'}
+                            onChange={(e) => onFilterChange({ ...filters, role: e.target.value, page: 1 })}
                             InputProps={{
                                 startAdornment: <InputAdornment position="start"><WorkOutlineIcon fontSize="small" /></InputAdornment>,
                             }}
                             sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
                         >
                             <MenuItem value="all">All Roles</MenuItem>
+                            <MenuItem value="ROLE_ADMIN">Admin</MenuItem>
+                            <MenuItem value="ROLE_MANAGER">Manager</MenuItem>
+                            <MenuItem value="ROLE_STAFF">Staff</MenuItem>
                         </TextField>
                     </Grid>
                     <Grid item xs={12} md={2}>
@@ -108,6 +136,10 @@ const EmployeeList = () => {
                             fullWidth
                             variant="contained"
                             startIcon={<FilterListOffIcon />}
+                            onClick={() => {
+                                setLocalKeyword('');
+                                onFilterChange({ keyword: '', role: 'all', storeId: 'all', page: 1 });
+                            }}
                             sx={{ backgroundColor: '#f1f5f9', color: '#64748b', textTransform: 'none', fontWeight: 700, borderRadius: 2, boxShadow: 'none', height: 40 }}
                         >
                             Clear
@@ -127,69 +159,89 @@ const EmployeeList = () => {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {employees.map((row) => (
-                            <TableRow key={row.id}>
-                                <TableCell sx={{ color: '#94a3b8', fontSize: '0.85rem' }}>{row.id}</TableCell>
-                                <TableCell>
-                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                                        <Avatar sx={{ width: 32, height: 32, fontSize: '0.75rem', bgcolor: '#f1f5f9', color: '#475569', fontWeight: 700 }}>{row.initials}</Avatar>
-                                        <Typography sx={{ fontWeight: 700, fontSize: '0.875rem' }}>{row.name}</Typography>
-                                    </Box>
-                                </TableCell>
-                                <TableCell sx={{ color: '#64748b', fontSize: '0.875rem' }}>{row.username}</TableCell>
-                                <TableCell>
-                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                        <Typography sx={{ fontWeight: 700, fontSize: '0.875rem' }}>{row.store}</Typography>
-                                        <IconButton size="small"><LaunchIcon sx={{ fontSize: 14, color: '#94a3b8' }} /></IconButton>
-                                    </Box>
-                                </TableCell>
-                                <TableCell sx={{ color: '#475569', fontSize: '0.875rem' }}>{row.role}</TableCell>
-                                <TableCell>
-                                    <Chip
-                                        label={row.status}
-                                        size="small"
-                                        sx={{
-                                            backgroundColor: row.status === 'Active' ? '#000' : '#f1f5f9',
-                                            color: row.status === 'Active' ? '#fff' : '#94a3b8',
-                                            fontWeight: 700,
-                                            fontSize: '0.7rem',
-                                            borderRadius: 1.5
-                                        }}
-                                    />
-                                </TableCell>
-                                <TableCell>
-                                    <IconButton size="small" sx={{ color: '#94a3b8', mr: 1 }}><EditOutlinedIcon fontSize="small" /></IconButton>
-                                    <IconButton size="small" sx={{ color: '#94a3b8' }}>
-                                        {row.status === 'Active' ? <BlockIcon fontSize="small" /> : <CheckCircleOutlineIcon fontSize="small" />}
-                                    </IconButton>
+                        {employees.length > 0 ? (
+                            employees.map((row) => (
+                                <TableRow key={row.id}>
+                                    <TableCell sx={{ color: '#94a3b8', fontSize: '0.85rem' }}>{row.id}</TableCell>
+                                    <TableCell>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                                            <Avatar sx={{ width: 32, height: 32, fontSize: '0.75rem', bgcolor: '#f1f5f9', color: '#475569', fontWeight: 700 }}>
+                                                {getInitials(row.fullName || row.name)}
+                                            </Avatar>
+                                            <Typography sx={{ fontWeight: 700, fontSize: '0.875rem' }}>{row.fullName || row.name}</Typography>
+                                        </Box>
+                                    </TableCell>
+                                    <TableCell sx={{ color: '#64748b', fontSize: '0.875rem' }}>{row.username}</TableCell>
+                                    <TableCell>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                            <Typography sx={{ fontWeight: 700, fontSize: '0.875rem' }}>{row.storeName || 'N/A'}</Typography>
+                                            <IconButton size="small"><LaunchIcon sx={{ fontSize: 14, color: '#94a3b8' }} /></IconButton>
+                                        </Box>
+                                    </TableCell>
+                                    <TableCell sx={{ color: '#475569', fontSize: '0.875rem' }}>{row.role}</TableCell>
+                                    <TableCell>
+                                        <Chip
+                                            label={row.status}
+                                            size="small"
+                                            sx={{
+                                                backgroundColor: row.status === 'Active' ? '#000' : '#f1f5f9',
+                                                color: row.status === 'Active' ? '#fff' : '#94a3b8',
+                                                fontWeight: 700,
+                                                fontSize: '0.7rem',
+                                                borderRadius: 1.5
+                                            }}
+                                        />
+                                    </TableCell>
+                                    <TableCell>
+                                        <IconButton size="small" sx={{ color: '#94a3b8', mr: 1 }} onClick={() => onEdit(row)}>
+                                            <EditOutlinedIcon fontSize="small" />
+                                        </IconButton>
+                                        <IconButton size="small" sx={{ color: '#94a3b8' }} onClick={() => onToggleStatus(row)}>
+                                            {row.status === 'Active' ? <BlockIcon fontSize="small" /> : <CheckCircleOutlineIcon fontSize="small" />}
+                                        </IconButton>
+                                    </TableCell>
+                                </TableRow>
+                            ))
+                        ) : (
+                            <TableRow>
+                                <TableCell colSpan={7} align="center" sx={{ py: 8 }}>
+                                    <Typography variant="body1" sx={{ color: '#94a3b8', fontWeight: 600 }}>
+                                        No employees found in the database.
+                                    </Typography>
                                 </TableCell>
                             </TableRow>
-                        ))}
+                        )}
                     </TableBody>
                 </Table>
             </TableContainer>
 
             {/* Pagination */}
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 3 }}>
-                <Typography variant="body2" sx={{ color: '#94a3b8', fontWeight: 500 }}>Showing 1 to 5 of 42 employees</Typography>
-                <Pagination
-                    count={9}
-                    shape="rounded"
-                    size="small"
-                    renderItem={(item) => (
-                        <Box
-                            {...item}
-                            component={Button}
-                            sx={{
-                                minWidth: 32, height: 32, p: 0, borderRadius: 1.5,
-                                backgroundColor: item.selected ? '#000 !important' : 'transparent',
-                                color: item.selected ? '#fff !important' : '#64748b',
-                                fontWeight: 700
-                            }}
-                        />
-                    )}
-                />
-            </Box>
+            {employees.length > 0 && (
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 3 }}>
+                    <Typography variant="body2" sx={{ color: '#94a3b8', fontWeight: 500 }}>
+                        Total {totalElements} employees
+                    </Typography>
+                    <Pagination
+                        count={totalPages}
+                        page={filters?.page || 1}
+                        onChange={(e, p) => onFilterChange({ ...filters, page: p })}
+                        shape="rounded"
+                        size="small"
+                        renderItem={(item) => (
+                            <Box
+                                {...item}
+                                component={Button}
+                                sx={{
+                                    minWidth: 32, height: 32, p: 0, borderRadius: 1.5,
+                                    backgroundColor: item.selected ? '#000 !important' : 'transparent',
+                                    color: item.selected ? '#fff !important' : '#64748b',
+                                    fontWeight: 700
+                                }}
+                            />
+                        )}
+                    />
+                </Box>
+            )}
         </Box>
     );
 };
