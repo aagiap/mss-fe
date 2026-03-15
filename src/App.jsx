@@ -8,6 +8,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-d
 import LoginPage from "./pages/auth/LoginPage.jsx";
 import StoreManagementPage from "./pages/admin/StoreManagementPage.jsx";
 import EmployeeManagementPage from "./pages/admin/EmployeeManagementPage.jsx";
+import CreateOrderPage from "./pages/CreateOrderPage.jsx";
 
 function App() {
 
@@ -25,7 +26,7 @@ function App() {
             <Route path="/home" element={<HomePage />} />
 
             <Route path="/logout" element={<Logout />} />
-
+              <Route path="/orders/create" element={<CreateOrderPage />} />
 
             <Route path="/" element={<Navigate to="/login" replace />} />
 
