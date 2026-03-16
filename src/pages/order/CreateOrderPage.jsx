@@ -1,11 +1,12 @@
 import {useState, useEffect} from "react";
 import {useNavigate} from "react-router-dom";
 import {Container, Row, Col, Form, Button, Spinner, Alert} from "react-bootstrap";
-import {getUser} from "../api/auth.jsx";
-import {searchCustomer, createOrder} from "../api/orderApi";
-import api from "../api/api";
-import AddCustomerModal from "../components/AddCustomerModal";
-
+import {getUser} from "../../api/auth.jsx";
+import {searchCustomer, createOrder} from "../../api/orderApi.jsx";
+import api from "../../api/api.jsx";
+import AddCustomerModal from "../../components/AddCustomerModal.jsx";
+import OrderNavbar from "./OrderNavbar.jsx";
+import Logout from "../../components/Logout.jsx";
 export default function CreateOrderPage() {
     const navigate = useNavigate();
     const [showAddCustomer, setShowAddCustomer] = useState(false);
@@ -70,7 +71,8 @@ export default function CreateOrderPage() {
                 productId: product.id,
                 productName: product.name,
                 unitPrice: product.price,
-                quantity: 1
+                quantity: 1,
+                imageUrl: product.imageUrl || null
             }]);
         }
     };
@@ -151,35 +153,7 @@ export default function CreateOrderPage() {
     return (
         <div style={{minHeight: "100vh", background: "#f5f5f5"}}>
             {/* Navbar */}
-            <div style={{
-                background: "#fff", borderBottom: "1px solid #ddd",
-                padding: "10px 24px", display: "flex",
-                alignItems: "center", justifyContent: "space-between"
-            }}>
-                <div style={{display: "flex", gap: 32, fontWeight: 500}}>
-                    <span style={{borderBottom: "2px solid #333", paddingBottom: 4, cursor: "pointer"}}>POS</span>
-                    <span style={{color: "#888", cursor: "pointer"}}
-                          onClick={() => navigate("/orders")}>Order History</span>
-                    <span style={{color: "#888", cursor: "pointer"}}
-                          onClick={() => navigate("/customers")}>Customer</span>
-                </div>
-                {currentUser && (
-                    <div style={{display: "flex", alignItems: "center", gap: 10, fontSize: 14}}>
-                        <div style={{textAlign: "right"}}>
-                            <div style={{fontWeight: 600}}>{currentUser.fullName}</div>
-                            <div style={{color: "#888", fontSize: 12}}>Store ID: {currentUser.storeId}</div>
-                        </div>
-                        <div style={{
-                            width: 36, height: 36, borderRadius: "50%", background: "#222",
-                            color: "#fff", display: "flex", alignItems: "center",
-                            justifyContent: "center", fontWeight: 700, fontSize: 16
-                        }}>
-                            {currentUser.fullName?.charAt(0)}
-                        </div>
-                    </div>
-                )}
-            </div>
-
+            <OrderNavbar currentUser={currentUser} activePage="POS" onLogout={() => navigate("/logout")} />
             <Container fluid className="py-3 px-4">
                 <Row>
                     {/* LEFT: Product Search + Grid */}
@@ -231,10 +205,20 @@ export default function CreateOrderPage() {
                                         <div style={{
                                             width: "100%", aspectRatio: "1",
                                             background: "#f4f4f4", borderRadius: 8,
+                                            overflow: "hidden",
                                             display: "flex", alignItems: "center",
                                             justifyContent: "center", fontSize: 32
                                         }}>
-                                            {p ? "📦" : "🖼️"}
+                                            {p?.imageUrl ? (
+                                                <img
+                                                    src={p.imageUrl}
+                                                    alt={p.name}
+                                                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                                                    onError={e => { e.target.style.display = "none"; }}
+                                                />
+                                            ) : (
+                                                p ? "📦" : "🖼️"
+                                            )}
                                         </div>
                                         <div style={{fontWeight: 600, fontSize: 13, lineHeight: 1.4}}>
                                             {p?.name ?? ""}
@@ -283,11 +267,26 @@ export default function CreateOrderPage() {
                                             display: "flex", alignItems: "center", gap: 10,
                                             padding: "8px 0", borderBottom: "1px solid #f3f3f3"
                                         }}>
+                                            {/*<div style={{*/}
+                                            {/*    width: 44, height: 44, background: "#f4f4f4",*/}
+                                            {/*    borderRadius: 6, flexShrink: 0,*/}
+                                            {/*    display: "flex", alignItems: "center", justifyContent: "center"*/}
+                                            {/*}}>📦*/}
+                                            {/*</div>*/}
                                             <div style={{
                                                 width: 44, height: 44, background: "#f4f4f4",
                                                 borderRadius: 6, flexShrink: 0,
+                                                overflow: "hidden",
                                                 display: "flex", alignItems: "center", justifyContent: "center"
-                                            }}>📦
+                                            }}>
+                                                {item.imageUrl ? (
+                                                    <img
+                                                        src={item.imageUrl}
+                                                        alt={item.productName}
+                                                        style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                                                        onError={e => { e.target.style.display = "none"; }}
+                                                    />
+                                                ) : "📦"}
                                             </div>
                                             <div style={{flex: 1, minWidth: 0}}>
                                                 <div style={{
@@ -300,7 +299,7 @@ export default function CreateOrderPage() {
                                                     {item.productName}
                                                 </div>
                                                 <div style={{fontSize: 11, color: "#999"}}>
-                                                    {Number(item.unitPrice).toLocaleString()} đ
+                                                    {Number(item.price).toLocaleString()} đ
                                                 </div>
                                             </div>
                                             <Form.Control
