@@ -29,7 +29,7 @@ export default function OrderNavbar({ currentUser, activePage, onLogout}) {
     const navItems = [
         { label: "POS", path: "/orders/create" },
         { label: "Order History", path: "/orders" },
-        { label: "Customer", path: "/customers" },
+        { label: "Revenue", path: "/orders/revenue" },
     ];
 
     return (

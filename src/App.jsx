@@ -12,6 +12,7 @@ import CreateOrderPage from "./pages/order/CreateOrderPage.jsx";
 import PaymentPage from "./pages/order/PaymentPage.jsx";
 import OrderHistoryPage from "./pages/order/OrderHistoryPage.jsx";
 import OrderDetailPage from "./pages/order/OrderDetailPage.jsx";
+import RevenueReportPage from "./pages/order/RevenueReportPage.jsx";
 
 function App() {
 
@@ -33,12 +34,13 @@ function App() {
 
             {/* ================= USER ROUTES ================= */}
               <Route path="/orders/*" element={
-                  <ProtectedRoute roles={["ROLE_CASHIER", "ROLE_STAFF", "ROLE_ADMIN"]}>
+                  <ProtectedRoute roles={["ROLE_CASHIER","ROLE_MANAGER", "ROLE_STAFF"]}>
                       <Routes>
                           <Route path="create" element={<CreateOrderPage />} />
                           <Route path="payment/:orderId" element={<PaymentPage />} />
                           <Route path="/" element={<OrderHistoryPage />} />
                           <Route path=":orderId/detail" element={<OrderDetailPage />} />
+                          <Route path="revenue" element={<RevenueReportPage />} />
                       </Routes>
                   </ProtectedRoute>
               } />

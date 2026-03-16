@@ -27,7 +27,8 @@ export default function OrderDetailPage() {
     const [showCancel, setShowCancel] = useState(false);
     const [cancelling, setCancelling] = useState(false);
     const [cancelError, setCancelError] = useState("");
-
+    const [storeName, setStoreName] = useState("");
+    const [cashierName, setCashierName] = useState("");
     useEffect(() => {
         getUser().then(setCurrentUser);
         loadOrder();
@@ -39,7 +40,19 @@ export default function OrderDetailPage() {
         try {
             const result = await getOrderDetail(orderId);
             setOrder(result);
+// Fetch store name
+            if (result.storeId) {
+                api.get(`/auth/stores/${result.storeId}`)
+                    .then(res => setStoreName(res.data?.data?.name || `#${result.storeId}`))
+                    .catch(() => setStoreName(`#${result.storeId}`));
+            }
 
+// Fetch cashier name
+            if (result.employeeId) {
+                api.get(`/auth/employees/${result.employeeId}`)
+                    .then(res => setCashierName(res.data?.data?.fullName || `#${result.employeeId}`))
+                    .catch(() => setCashierName(`#${result.employeeId}`));
+            }
             // Load payment info nếu order đã SUCCESSFUL
             if (result.status === "SUCCESSFUL") {
                 try {
@@ -158,7 +171,7 @@ export default function OrderDetailPage() {
                             <Row>
                                 <Col xs={6}>
                                     <div style={{ fontSize: 13, marginBottom: 8 }}>
-                                        <strong>Store:</strong> {order?.storeId ? `#${order.storeId}` : "-"}
+                                        <strong>Store:</strong> {storeName || `#${order?.storeId}`}
                                     </div>
                                     <div style={{ fontSize: 13 }}>
                                         <strong>Customer Name:</strong> {order?.customerName || "-"}
@@ -166,7 +179,7 @@ export default function OrderDetailPage() {
                                 </Col>
                                 <Col xs={6}>
                                     <div style={{ fontSize: 13, marginBottom: 8 }}>
-                                        <strong>Cashier:</strong> {order?.employeeId ? `#${order.employeeId}` : "-"}
+                                        <strong>Cashier:</strong> {cashierName || `#${order?.employeeId}`}
                                     </div>
                                     <div style={{ fontSize: 13 }}>
                                         <strong>Total:</strong>{" "}

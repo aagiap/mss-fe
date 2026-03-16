@@ -69,3 +69,8 @@ export const getCustomerById = async (customerId) => {
     const response = await api.get(`/customer/${customerId}`);
     return response.data.data;
 };
+
+export const getRevenue = async (params) => {
+    const response = await api.get("/order/revenue", { params });
+    return response.data.data;
+};
