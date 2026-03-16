@@ -8,7 +8,10 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-d
 import LoginPage from "./pages/auth/LoginPage.jsx";
 import StoreManagementPage from "./pages/admin/StoreManagementPage.jsx";
 import EmployeeManagementPage from "./pages/admin/EmployeeManagementPage.jsx";
-import CreateOrderPage from "./pages/CreateOrderPage.jsx";
+import CreateOrderPage from "./pages/order/CreateOrderPage.jsx";
+import PaymentPage from "./pages/order/PaymentPage.jsx";
+import OrderHistoryPage from "./pages/order/OrderHistoryPage.jsx";
+import OrderDetailPage from "./pages/order/OrderDetailPage.jsx";
 
 function App() {
 
@@ -26,11 +29,19 @@ function App() {
             <Route path="/home" element={<HomePage />} />
 
             <Route path="/logout" element={<Logout />} />
-              <Route path="/orders/create" element={<CreateOrderPage />} />
-
             <Route path="/" element={<Navigate to="/login" replace />} />
 
             {/* ================= USER ROUTES ================= */}
+              <Route path="/orders/*" element={
+                  <ProtectedRoute roles={["ROLE_CASHIER", "ROLE_STAFF", "ROLE_ADMIN"]}>
+                      <Routes>
+                          <Route path="create" element={<CreateOrderPage />} />
+                          <Route path="payment/:orderId" element={<PaymentPage />} />
+                          <Route path="/" element={<OrderHistoryPage />} />
+                          <Route path=":orderId/detail" element={<OrderDetailPage />} />
+                      </Routes>
+                  </ProtectedRoute>
+              } />
             {/*<Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />*/}
             {/* ================= ADMIN ROUTES ================= */}
             <Route path="/admin/*" element={
