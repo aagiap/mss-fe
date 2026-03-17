@@ -13,6 +13,9 @@ import PaymentPage from "./pages/order/PaymentPage.jsx";
 import OrderHistoryPage from "./pages/order/OrderHistoryPage.jsx";
 import OrderDetailPage from "./pages/order/OrderDetailPage.jsx";
 import RevenueReportPage from "./pages/order/RevenueReportPage.jsx";
+import ProductList from "./pages/product/ProductList.jsx";
+import CategoryList from "./pages/product/CategoryList.jsx";
+import AttributeList from "./pages/product/AttributeList.jsx";
 
 function App() {
 
@@ -28,7 +31,6 @@ function App() {
             } />
 
             <Route path="/home" element={<HomePage />} />
-
             <Route path="/logout" element={<Logout />} />
             <Route path="/" element={<Navigate to="/login" replace />} />
 
@@ -53,6 +55,10 @@ function App() {
 
                   <Route path="store" element={<StoreManagementPage />} />
                   <Route path="employee" element={<EmployeeManagementPage />} />
+
+                    <Route path="product" element={<ProductList/>}/>
+                    <Route path="category" element={<CategoryList/>}/>
+                    <Route path="attribute" element={<AttributeList/>}/>
                 </Routes>
               </ProtectedRoute>
             } />

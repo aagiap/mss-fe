@@ -1,0 +1,176 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+.cf-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+}
+
+.cf-modal {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+    width: 100%;
+    max-width: 460px;
+    font-family: 'Inter', sans-serif;
+    overflow: hidden;
+}
+
+.cf-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.cf-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: #111827;
+    margin: 0;
+}
+
+.cf-close-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #9ca3af;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    padding: 4px;
+    transition: all 0.15s;
+}
+.cf-close-btn:hover { color: #374151; background: #f3f4f6; }
+
+.cf-body {
+    padding: 24px;
+}
+
+.cf-field {
+    margin-bottom: 18px;
+}
+
+.cf-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 6px;
+}
+
+.cf-input {
+    width: 100%;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: #111827;
+    background: #f9fafb;
+    outline: none;
+    transition: all 0.15s;
+    box-sizing: border-box;
+}
+.cf-input:focus { border-color: #6366f1; background: #fff; box-shadow: 0 0 0 3px rgba(99,102,241,0.08); }
+.cf-input::placeholder { color: #9ca3af; }
+
+.cf-textarea {
+    resize: vertical;
+    min-height: 100px;
+    line-height: 1.6;
+}
+
+.cf-char-count {
+    text-align: right;
+    font-size: 12px;
+    color: #9ca3af;
+    margin-top: 4px;
+}
+
+.cf-icon-section { margin-bottom: 8px; }
+
+.cf-icon-grid {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+}
+
+.cf-icon-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    border: 1.5px solid #e5e7eb;
+    background: #f9fafb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 18px;
+    transition: all 0.15s;
+    color: #6b7280;
+}
+.cf-icon-btn:hover { border-color: #6366f1; background: #eef2ff; }
+.cf-icon-btn.selected { border-color: #3b82f6; background: #3b82f6; color: #fff; }
+.cf-icon-btn.add { font-size: 20px; color: #9ca3af; }
+.cf-icon-btn.add:hover { color: #374151; }
+
+.cf-error {
+    margin-bottom: 14px;
+    padding: 10px 14px;
+    background: #fef2f2;
+    border: 1.5px solid #fecaca;
+    border-radius: 8px;
+    color: #dc2626;
+    font-size: 13px;
+}
+
+.cf-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 16px 24px 20px;
+    border-top: 1px solid #f3f4f6;
+}
+
+.cf-cancel-btn {
+    padding: 9px 20px;
+    border-radius: 8px;
+    border: 1.5px solid #e5e7eb;
+    background: #fff;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: #374151;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+.cf-cancel-btn:hover { background: #f9fafb; border-color: #d1d5db; }
+
+.cf-submit-btn {
+    padding: 9px 22px;
+    border-radius: 8px;
+    border: none;
+    background: #3b82f6;
+    color: #fff;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    transition: background 0.15s;
+}
+.cf-submit-btn:hover { background: #2563eb; }
+.cf-submit-btn:disabled { background: #93c5fd; cursor: not-allowed; }
+
+@keyframes cf-spin { to { transform: rotate(360deg); } }
