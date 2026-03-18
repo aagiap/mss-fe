@@ -73,6 +73,15 @@ function App() {
               }
             />
 
+            <Route
+              path="/inventory"
+              element={
+                <ProtectedRoute roles={["ROLE_STAFF", "ROLE_MANAGER", "ROLE_ADMIN"]}>
+                  <InventoryPage />
+                </ProtectedRoute>
+              }
+            />
+
             {/* Catch-all: Nếu gõ bậy bạ thì về trang chủ */}
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
