@@ -1,0 +1,182 @@
+import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import api from "../../api/api";
+
+export default function InventoryNavbar({ currentUser, onLogout }) {
+  const navigate = useNavigate();
+  const [storeName, setStoreName] = useState("");
+  const [showDropdown, setShowDropdown] = useState(false);
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    if (!currentUser?.storeId || currentUser.storeId === 0) {
+      setStoreName("All Stores");
+      return;
+    }
+
+    api
+      .get(`/auth/stores/${currentUser.storeId}`)
+      .then((res) => setStoreName(res.data?.data?.name || `Store #${currentUser.storeId}`))
+      .catch(() => setStoreName(`Store #${currentUser.storeId}`));
+  }, [currentUser?.storeId]);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowDropdown(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  return (
+    <div
+      style={{
+        background: "#fff",
+        borderBottom: "1px solid #ddd",
+        padding: "10px 24px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        position: "sticky",
+        top: 0,
+        zIndex: 100,
+      }}
+    >
+      <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+        <div
+          style={{
+            width: 40,
+            height: 40,
+            background: "#f0f0f0",
+            borderRadius: 6,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: 18,
+          }}
+        >
+          📦
+        </div>
+        <div>
+          <div style={{ fontWeight: 700, fontSize: 16 }}>Inventory Management</div>
+          <div style={{ color: "#888", fontSize: 12 }}>Stock, supplier, transfer and reports</div>
+        </div>
+      </div>
+
+      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        <button
+          onClick={() => navigate("/orders")}
+          style={{
+            border: "1px solid #ddd",
+            background: "#fff",
+            borderRadius: 8,
+            padding: "6px 10px",
+            fontSize: 13,
+            cursor: "pointer",
+          }}
+        >
+          Orders
+        </button>
+        <button
+          onClick={() => navigate("/admin/store")}
+          style={{
+            border: "1px solid #ddd",
+            background: "#fff",
+            borderRadius: 8,
+            padding: "6px 10px",
+            fontSize: 13,
+            cursor: "pointer",
+          }}
+        >
+          Admin
+        </button>
+
+        {currentUser && (
+          <div ref={dropdownRef} style={{ position: "relative" }}>
+            <div
+              onClick={() => setShowDropdown((v) => !v)}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                cursor: "pointer",
+                padding: "4px 8px",
+                borderRadius: 8,
+                background: showDropdown ? "#f5f5f5" : "transparent",
+              }}
+            >
+              <div style={{ textAlign: "right", fontSize: 14 }}>
+                <div style={{ fontWeight: 600 }}>{currentUser.fullName}</div>
+                <div style={{ color: "#888", fontSize: 12 }}>{storeName}</div>
+              </div>
+              <div
+                style={{
+                  width: 36,
+                  height: 36,
+                  borderRadius: "50%",
+                  background: "#222",
+                  color: "#fff",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontWeight: 700,
+                  fontSize: 16,
+                }}
+              >
+                {currentUser.fullName?.charAt(0)}
+              </div>
+            </div>
+
+            {showDropdown && (
+              <div
+                style={{
+                  position: "absolute",
+                  right: 0,
+                  top: "calc(100% + 8px)",
+                  background: "#fff",
+                  borderRadius: 8,
+                  border: "1px solid #e5e5e5",
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                  minWidth: 200,
+                  zIndex: 200,
+                  overflow: "hidden",
+                }}
+              >
+                <div
+                  style={{
+                    padding: "12px 16px",
+                    borderBottom: "1px solid #f0f0f0",
+                    background: "#fafafa",
+                  }}
+                >
+                  <div style={{ fontWeight: 600, fontSize: 14 }}>{currentUser.fullName}</div>
+                  <div style={{ color: "#888", fontSize: 12 }}>{storeName}</div>
+                  <div style={{ color: "#aaa", fontSize: 11, marginTop: 2 }}>
+                    {currentUser.role?.replace("ROLE_", "")}
+                  </div>
+                </div>
+                <div
+                  onClick={onLogout}
+                  style={{
+                    padding: "10px 16px",
+                    cursor: "pointer",
+                    fontSize: 14,
+                    color: "#dc3545",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 8,
+                  }}
+                >
+                  Logout
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

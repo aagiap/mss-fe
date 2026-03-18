@@ -16,6 +16,7 @@ import RevenueReportPage from "./pages/order/RevenueReportPage.jsx";
 import ProductList from "./pages/product/ProductList.jsx";
 import CategoryList from "./pages/product/CategoryList.jsx";
 import AttributeList from "./pages/product/AttributeList.jsx";
+import InventoryPage from "./pages/inventory/InventoryPage.jsx";
 
 function App() {
 
@@ -62,6 +63,15 @@ function App() {
                 </Routes>
               </ProtectedRoute>
             } />
+
+            <Route
+              path="/inventory"
+              element={
+                <ProtectedRoute roles={["ROLE_STAFF", "ROLE_MANAGER", "ROLE_ADMIN"]}>
+                  <InventoryPage />
+                </ProtectedRoute>
+              }
+            />
 
             {/* Catch-all: Nếu gõ bậy bạ thì về trang chủ */}
             <Route path="*" element={<Navigate to="/" replace />} />
