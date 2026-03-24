@@ -18,6 +18,25 @@ function LoginPage() {
     const navigate = useNavigate();
     const { login: loginContext } = useContext(AuthContext);
 
+    // const handleSubmit = async (e) => {
+    //     e.preventDefault();
+    //     setError("");
+    //     setLoading(true);
+    //
+    //     try {
+    //         const data = await apiLogin(username, password);
+    //         const token = data.data.token;
+    //         saveToken(token);
+    //         await loginContext(token);
+    //         navigate("/home");
+    //     } catch (err) {
+    //         console.error(err);
+    //         // Hiển thị message lỗi từ backend nếu có
+    //         setError(err.response?.data?.message || err.message || "Login failed");
+    //     } finally {
+    //         setLoading(false);
+    //     }
+    // };
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError("");
@@ -27,16 +46,27 @@ function LoginPage() {
             const data = await apiLogin(username, password);
             const token = data.data.token;
             saveToken(token);
-            await loginContext(token);
-            navigate("/home");
+            const userData = await loginContext(token);
+            const role = userData?.role;
+
+            if (role === "ROLE_ADMIN") {
+                navigate("/admin/store");
+            } else if (role === "ROLE_MANAGER" || role === "ROLE_STAFF") {
+                navigate("/inventory");
+            } else if (role === "ROLE_CASHIER") {
+                navigate("/orders/create");
+            } else {
+                navigate("/home");
+            }
+
         } catch (err) {
             console.error(err);
-            // Hiển thị message lỗi từ backend nếu có
             setError(err.response?.data?.message || err.message || "Login failed");
         } finally {
             setLoading(false);
         }
     };
+
 
     return (
         <div className="sign-in__wrapper" style={{ backgroundImage: `url(${BackgroundImage})` }}>
