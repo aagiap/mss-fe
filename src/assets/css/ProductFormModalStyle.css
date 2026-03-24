@@ -184,3 +184,25 @@
 .pf-cancel-btn:hover { background: #f9fafb; border-color: #9ca3af; }
 
 @keyframes pf-spin { to { transform: rotate(360deg); } }
+
+.pf-remove-img-btn {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    background: rgba(239, 68, 68, 0.9);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    font-size: 14px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+}
+.pf-remove-img-btn:hover {
+    background: rgb(220, 38, 38);
+}

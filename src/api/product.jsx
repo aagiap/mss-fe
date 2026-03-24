@@ -50,7 +50,37 @@ const product = {
         } catch (error) {
             throw error.response?.data || error.message;
         }
-    }
+    },
+    getImages: async (id) => {
+        try {
+            const response = await api.get(`${PRODUCT_API_PATH}/${id}/images`);
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || error.message;
+        }
+    },
+
+    createWithImages: async (formData) => {
+        try {
+            const response = await api.post(PRODUCT_API_PATH, formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || error.message;
+        }
+    },
+
+    updateWithImages: async (id, formData) => {
+        try {
+            const response = await api.put(`${PRODUCT_API_PATH}/${id}`, formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || error.message;
+        }
+    },
 };
 
 export default product;

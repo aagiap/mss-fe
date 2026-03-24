@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import product from "../../api/product.jsx";
+import categoryApi from "../../api/category.jsx";
 import ProductFormModal from "../../components/product/ProductFormModal.jsx";
 import ToastNotification from "../../components/common/ToastNotification.jsx";
 import useToast from "../../hooks/useToast";
@@ -7,6 +8,7 @@ import '../../assets/css/ProductListStyle.css';
 
 const ProductList = () => {
     const [products, setProducts] = useState([]);
+    const [categories, setCategories] = useState([]); // THÊM STATE LƯU CATEGORY
     const [search, setSearch] = useState('');
     const [loading, setLoading] = useState(false);
     const [page, setPage] = useState(0);
@@ -17,6 +19,22 @@ const ProductList = () => {
     const [editData, setEditData] = useState(null);
 
     const { toasts, removeToast, toast } = useToast();
+
+    // LẤY DANH SÁCH CATEGORY TỪ BACKEND ĐỂ MAP TÊN
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                // Lấy size lớn (ví dụ 1000) để đảm bảo có đủ data map id sang name
+                const res = await categoryApi.getAll({ page: 0, size: 1000 });
+                if (res && res.data) {
+                    setCategories(res.data.content || []);
+                }
+            } catch (error) {
+                console.error("Error fetching categories:", error);
+            }
+        };
+        fetchCategories();
+    }, []);
 
     const fetchProducts = async () => {
         setLoading(true);
@@ -53,7 +71,6 @@ const ProductList = () => {
         }
     };
 
-    // Callback sau khi modal create/update thành công
     const handleModalSuccess = (isEdit) => {
         if (isEdit) {
             toast.success("Cập nhật sản phẩm thành công");
@@ -73,16 +90,21 @@ const ProductList = () => {
         return isNaN(num) ? price : `$${num.toFixed(2)}`;
     };
 
+    // HÀM HỖ TRỢ LẤY TÊN CATEGORY TỪ ID
+    const getCategoryName = (categoryId) => {
+        if (!categoryId) return '—';
+        const category = categories.find(c => c.id === categoryId);
+        return category ? category.name : `#${categoryId}`;
+    };
+
     return (
         <div style={{
             fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
             padding: '32px', background: '#f8f9fc', minHeight: '100vh', color: '#1a1a2e'
         }}>
-            {/* Toast */}
             <ToastNotification toasts={toasts} removeToast={removeToast} />
 
             <div className="pi-container">
-                {/* Header */}
                 <div className="pi-header">
                     <h1 className="pi-title">Product Inventory</h1>
                     <button className="pi-create-btn" onClick={() => { setEditData(null); setIsModalOpen(true); }}>
@@ -90,21 +112,19 @@ const ProductList = () => {
                     </button>
                 </div>
 
-                {/* Search */}
                 <div className="pi-search-wrapper">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2.5" strokeLinecap="round">
                         <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
                     </svg>
                     <input
                         className="pi-search-input" type="text"
-                        placeholder="Search products by name or barcode"
+                        placeholder="Search products by name"
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                         onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                     />
                 </div>
 
-                {/* Filters */}
                 <div className="pi-filters">
                     <div style={{ position: 'relative' }}>
                         <button
@@ -129,7 +149,6 @@ const ProductList = () => {
                     </div>
                 </div>
 
-                {/* Table */}
                 {loading ? (
                     <p style={{ color: '#9ca3af', fontSize: '14px' }}>Đang tải dữ liệu...</p>
                 ) : (
@@ -140,7 +159,7 @@ const ProductList = () => {
                                 <th>Product Name</th>
                                 <th>Barcode</th>
                                 <th>Price</th>
-                                <th>Category ID</th>
+                                <th>Category</th>
                                 <th>Status</th>
                                 <th>Actions</th>
                             </tr>
@@ -154,11 +173,14 @@ const ProductList = () => {
                                         <td>{p.name}</td>
                                         <td style={{ color: '#6b7280', fontSize: '13px' }}>{p.barcode || '—'}</td>
                                         <td className="pi-price">{formatPrice(p.price)}</td>
-                                        <td className="pi-category">{p.categoryId ? `#${p.categoryId}` : '—'}</td>
+
+                                        {/* HIỂN THỊ TÊN CATEGORY Ở ĐÂY */}
+                                        <td className="pi-category">{getCategoryName(p.categoryId)}</td>
+
                                         <td>
-                                                <span className={`pi-badge ${p.status !== 'ACTIVE' ? 'out' : ''}`}>
-                                                    {p.status === 'ACTIVE' ? 'In Stock' : 'Out of Stock'}
-                                                </span>
+                                            <span className={`pi-badge ${p.status !== 'ACTIVE' ? 'out' : ''}`}>
+                                                {p.status === 'ACTIVE' ? 'In Stock' : 'Out of Stock'}
+                                            </span>
                                         </td>
                                         <td>
                                             <button className="pi-action-btn"
@@ -175,7 +197,6 @@ const ProductList = () => {
                     </div>
                 )}
 
-                {/* Pagination */}
                 {!loading && totalPages > 1 && (
                     <div className="pi-pagination">
                         <button className="pi-page-btn" disabled={page === 0} onClick={() => setPage(page - 1)}>← Trước</button>
@@ -188,9 +209,9 @@ const ProductList = () => {
             <ProductFormModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
-                // Truyền isEdit để biết là create hay update
                 onSuccess={() => handleModalSuccess(!!editData)}
                 editData={editData}
+                categories={categories} // TRUYỀN DANH SÁCH CATEGORY XUỐNG MODAL
             />
         </div>
     );
