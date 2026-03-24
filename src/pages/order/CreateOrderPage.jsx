@@ -299,7 +299,7 @@ export default function CreateOrderPage() {
                                                     {item.productName}
                                                 </div>
                                                 <div style={{fontSize: 11, color: "#999"}}>
-                                                    {Number(item.price).toLocaleString()} đ
+                                                    {Number(item.unitPrice).toLocaleString()} đ
                                                 </div>
                                             </div>
                                             <Form.Control
